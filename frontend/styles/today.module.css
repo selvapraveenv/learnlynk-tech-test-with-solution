@@ -1,0 +1,50 @@
+/* Tooltip Styles */
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  background-color: #222;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tooltipVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Rest of your styles (tasks, calendar, etc.) */
+.mainContainer { padding: 1.5rem; max-width: 1200px; margin: 0 auto; display: flex; gap: 2rem; background: linear-gradient(135deg,#1b1b2f,#162447); min-height: 90vh; border-radius:12px;color:#e0e0e0;font-family:Arial,sans-serif; }
+.tasksSection { flex:2; background:#1e1e2f; border-radius:14px; padding:1.5rem; box-shadow:0 6px 20px rgba(0,0,0,0.4); display:flex; flex-direction:column; }
+.tasksTitle{ margin-bottom:1rem; font-size:1.9rem; font-weight:700; text-align: center;}
+.loading{ color:#ccc; }
+.error{ color:#ff6b6b; }
+.noTasks{ opacity:0.7; }
+.tableWrapper{ margin-top:1rem; border-radius:12px; overflow:hidden; }
+.taskTable{ width:100%; border-collapse:collapse; }
+.taskTable th{ padding:12px; text-align:left; font-weight:600; border-bottom:1px solid #444; color:#e0e0e0; background-color:#2a2a40; }
+.taskTable td{ padding:12px; border-bottom:1px solid #333; }
+.taskRow{ transition:0.2s; position:relative; }
+.taskRow:hover{ background-color:#2a2a40; }
+.application{ color:#ccc; }
+.dueAt{ color:#ccc; }
+.completed{ font-weight:bold; color:#4caf50; }
+.open{ font-weight:bold; color:#ff6b6b; }
+.completeBtn{ padding:6px 14px; background-color:#ff6b6b; color:white; border:none; border-radius:6px; cursor:pointer; transition:0.3s; }
+.completeBtn:disabled{ cursor:not-allowed; opacity:0.6; }
+
+.calendarSection{ flex:1; background:#162447; padding:1rem; border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.4); display:flex; flex-direction:column; border-left:2px solid #444; height:fit-content; }
+.calendarHeader{ font-size:1.4rem; margin-bottom:12px; text-align:center; display:flex; justify-content:center; gap:0.5rem; align-items:center; }
+.calendarHeader select, .calendarHeader input{ font-size:1rem; padding:6px 10px; border-radius:8px; border:1px solid #444; background-color:#2a2a40; color:#e0e0e0; outline:none; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:0.2s; }
+.calendarHeader input{ text-align:center; }
+.calendarHeader select:focus, .calendarHeader input:focus{ border-color:#ff6b6b; }
+.daysGrid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; padding:4px; }
+.dayLabel{ text-align:center; font-weight:bold; color:#a0a0a0; padding:6px 0; font-size:0.85rem; }
+.dayCell{ padding:10px; background:#2a2a40; color:#e0e0e0; border-radius:8px; text-align:center; cursor:pointer; transition:0.2s; }
+.selectedDay{ background:#ff6b6b; color:white; font-weight:bold; }
+.pendingTaskDay{ background:#3e3ea0; }
