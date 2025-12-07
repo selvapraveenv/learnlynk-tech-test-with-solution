@@ -1,84 +1,91 @@
-LearnLynk Technical Assessment – Full Solution
+# LearnLynk Technical Assessment – Full Solution
 
 This repository contains the complete implementation for the LearnLynk Technical Assessment, including:
 
-PostgreSQL database schema
+- PostgreSQL Database Schema  
+- Row-Level Security (RLS) Policies  
+- Supabase Edge Function  
+- Next.js Dashboard Page  
+- Stripe Checkout Written Explanation  
 
-Row-Level Security (RLS) policies
+The project is structured to be easy to run and easy to review, while maintaining clean engineering practices.
 
-Supabase Edge Function
+---
 
-Next.js dashboard page
+## 📁 Project Structure
 
-Stripe Checkout written explanation
-
-The project is structured to be easy to run and easy to review, even for someone with minimal technical background, while still maintaining strong engineering quality.
-
-📁 Project Structure
 backend/
-  ├── schema.sql
-  ├── rls_policies.sql
-  └── edge-functions/
-        └── create-task/
-              └── index.ts
+├── schema.sql
+├── rls_policies.sql
+└── edge-functions/
+└── create-task/
+└── index.ts
 
 frontend/
-  ├── pages/
-        └── dashboard/
-              └── today.tsx
-  ├── styles
-        └── today.module.css
-  ├── .env.local
-  └── package.json
+├── pages/
+└── dashboard/
+└── today.tsx
+├── styles/
+└── today.module.css
+├── .env.local
+└── package.json
 
 README.md
 
-🚀 Setup & Execution Guide (Step-by-Step)
+yaml
+Copy code
 
-This guide explains how to run the project from scratch in a simple way.
+---
 
-1. Requirements
+# 🚀 Setup & Execution Guide (Step-by-Step)
 
-Before starting, install:
+This guide explains how to run the project even if you're new to Supabase or Next.js.
 
-Node.js (LTS)
+---
 
-Supabase account → https://supabase.com
+## 1. Requirements
 
-Supabase CLI (optional but recommended)
+Install the following before starting:
 
-Git
+- **Node.js (LTS version)**
+- **Supabase account** → https://supabase.com  
+- **Supabase CLI** (recommended)
+- **Git**
 
-2. Clone the Repository
+---
+
+## 2. Clone the Repository
+
+```sh
 git clone https://github.com/<your-username>/learnlynk-tech-test-with-solution
 cd learnlynk-tech-test-with-solution
-
 3. Configure Environment Variables
 Frontend → frontend/.env.local
+ini
+Copy code
 NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
-
 Backend → Supabase Dashboard → Project Settings → API
-
 Store:
 
+ini
+Copy code
 SUPABASE_URL=<your-supabase-url>
 SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
-
-
-💡 Important:
-The service role key must only be used in backend functions—never in the browser.
+⚠️ Important:
+Service role key must NEVER be used in frontend/browser code.
 
 4. Set Up Database Schema (Task 1)
+Open Supabase Dashboard → SQL Editor.
 
-Open Supabase Dashboard → SQL Editor, paste:
+Paste the content of:
 
+pgsql
+Copy code
 backend/schema.sql
-
-
 Run it.
 
-This will create:
+This creates the tables:
 
 leads
 
@@ -86,42 +93,43 @@ applications
 
 tasks
 
-with:
+With:
 
 UUID primary keys
 
-tenant-based ownership
+Tenant-based constraints
 
-foreign keys
+Foreign keys
 
-allowed task types (call, email, review)
+Task type validation
 
-constraints (e.g., due_at >= created_at)
+Date constraints
 
-indexes for optimized querying
+Optimized indexes
 
 5. Apply RLS Policies (Task 2)
+In Supabase SQL Editor, paste:
 
-Again in SQL Editor, paste:
-
+bash
+Copy code
 backend/rls_policies.sql
-
-
 Run it.
 
-This enables security rules:
+This enables the required access control rules:
 
-Admins → can read all leads in their tenant
+Admins can:
 
-Counselors → can only read
+View all leads under their tenant
 
-Leads they own
+Counselors can:
 
-Leads from their teams
+View leads they own
 
-Insert allowed for both roles under same tenant
+View leads assigned to any of their teams
 
-These policies use JWT claims:
+Both Admins and Counselors can insert leads within their tenant.
+
+JWT claims used:
 
 user_id
 
@@ -129,65 +137,63 @@ role
 
 tenant_id
 
-6. Deploy the Edge Function (Task 3)
+6. Deploy Edge Function (Task 3)
+Navigate to:
 
-Go to:
-
+pgsql
+Copy code
 backend/edge-functions/create-task
+Deploy the function:
 
-
-Run:
-
+sh
+Copy code
 supabase functions deploy create-task
+This function:
 
+Validates task_type (call, email, review)
 
-The function:
+Validates due_at (must be future timestamp)
 
-Validates task_type
-
-Validates due_at
-
-Inserts task into the database using the service role key
+Inserts a task using service role key
 
 Returns:
 
+json
+Copy code
 { "success": true, "task_id": "<uuid>" }
+Error handling:
 
+400 → validation error
 
-Handles:
-
-400 → invalid input
-
-500 → internal server errors
+500 → internal error
 
 7. Run the Frontend (Task 4)
+sh
+Copy code
 cd frontend
 npm install
 npm run dev
-
-
 Open:
 
-👉 http://localhost:3001/
+👉 http://localhost:3000/dashboard/today
 
-The page displays today’s tasks including:
+The page displays today's due tasks (excluding completed ones):
 
-type
+task type
 
-application_id
+application id
 
 due_at
 
 status
 
-and a “Mark Complete” button that directly updates the record in Supabase.
+Each task includes a Mark Complete button that updates the task in Supabase.
 
-🧩 Task Descriptions (Technical Summary)
+🧩 Technical Breakdown of Tasks
 Task 1 — Database Schema
-
 Implemented:
 
-Standard audit fields
+id, tenant_id, created_at, updated_at
 
 Foreign keys:
 
@@ -195,61 +201,64 @@ applications.lead_id → leads.id
 
 tasks.application_id → applications.id
 
-Task type constraint
+tasks.type constraint (call/email/review)
 
-Due date constraint
+due_at >= created_at
 
 Indexes:
 
-Leads: tenant_id, owner_id, stage
+Leads → tenant_id, owner_id, stage
 
-Applications: tenant_id, lead_id
+Applications → tenant_id, lead_id
 
-Tasks: tenant_id, due_at, status
+Tasks → tenant_id, due_at, status
 
 Task 2 — Row-Level Security
+Access Rules
+Role	Access Description
+Admin	All leads in tenant
+Counselor	Leads they own OR are assigned via teams
 
-RLS rules allow:
-
-Role	Access
-Admin	All leads for their tenant
-Counselor	Leads they own or leads via teams they belong to
-
-Insert allowed only within same tenant.
+Insert is allowed for both roles within same tenant.
 
 Task 3 — Edge Function
-
 The function:
 
 Accepts JSON input
 
-Validates content
+Validates fields
 
 Inserts task
 
-Returns task ID
+Returns the new task ID
 
-Ensures secure server-side creation using service role privileges.
+Uses secure service role privileges
 
-Task 4 — Frontend Today Dashboard
-
-The UI:
+Task 4 — Today Dashboard Page
+The frontend page:
 
 Fetches tasks due today
 
-Renders list
+Displays clean responsive UI
 
-Allows completing tasks
+Allows changing task status
 
-Updates Supabase directly
+Re-fetches after update
 
-Re-renders after update
-
-Simple, clean, and functional.
-
-💳 Task 5 — Stripe Checkout (Written Answer)
+💳 Task 5 — Stripe Checkout (Written Explanation)
 Stripe Answer
+To implement Stripe Checkout for application fees, the system first creates a new payment_requests row when the user begins the payment process. This row contains the user ID, tenant ID, amount, and a status of pending. Next, the backend uses the Stripe secret key to create a Checkout Session, specifying the amount, currency, and success/cancel URLs.
 
-To implement Stripe Checkout for application fees, I would begin by inserting a payment_requests row when the user initiates the payment flow. This row stores the user ID, tenant ID, amount, and status set to “pending”. After this, the backend calls the Stripe API to create a Checkout Session using the server secret key. The session ID and payment intent ID returned by Stripe are saved back into the payment_requests table.
+Stripe returns a session ID and payment intent ID, which are stored back in the payment_requests table. The user is then redirected to Stripe’s hosted payment page.
 
-The user is then redirected to the Stripe checkout page. Once the payment is completed, Stripe sends a webhook event to our backend. This webhook endpoint verifies the event signature for security, loads the corresponding payment request, and updates its status to “paid”. At the same time, the related application record is updated to reflect that the fee has been successfully processed. This ensures the payment flow is fully secure, verified, and cannot be manipulated from the frontend.
+After the payment is completed, Stripe sends a webhook event to our backend. The webhook endpoint:
+
+Verifies the event signature (security)
+
+Retrieves the corresponding payment_requests row
+
+Updates its status to paid
+
+Updates the related application to mark the fee as completed
+
+This ensures the payment flow is secure, verified server-side, and cannot be manipulated from the frontend.
